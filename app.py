@@ -1,3 +1,76 @@
+# # import os
+# # import json
+# # from flask import Flask, request, jsonify, session, render_template
+# # from groq import Groq
+# # from flask_session import Session
+# # import random
+
+# # app = Flask(__name__)
+
+# # # Configuration for session management
+# # app.config['SECRET_KEY'] = 'supersecretkey'
+# # app.config['SESSION_TYPE'] = 'filesystem'
+# # Session(app)
+
+# # # Load API key from config.json
+# # working_dir = os.path.dirname(os.path.abspath(__file__))
+# # config_data = json.load(open(f"{working_dir}/config.json"))
+
+# # GROQ_API_KEY = config_data["GROQ_API_KEY"]
+# # os.environ["GROQ_API_KEY"] = GROQ_API_KEY
+
+# # client = Groq()
+
+# # # Predefined FAQs for suggestions
+# # FAQS = [
+# #     "What are the museum's opening hours?",
+# #     "Are there any tickets available for this weekend?",
+# #     "What is the price of a family ticket?",
+# #     "Can I book a guided tour?"
+# # ]
+
+# # # Home route that renders a simple chat interface
+# # @app.route('/')
+# # def index():
+# #     if "chat_history" not in session:
+# #         session["chat_history"] = []
+# #     return render_template('index.html', chat_history=session["chat_history"], faqs=FAQS)
+
+# # # API endpoint for handling user prompt
+# # @app.route('/ask', methods=['POST'])
+# # def ask_llama():
+# #     user_prompt = request.json.get('prompt')
+
+# #     if not user_prompt:
+# #         return jsonify({"error": "No prompt provided"}), 400
+
+# #     # Add user message to chat history
+# #     session["chat_history"].append({"role": "user", "content": user_prompt})
+
+# #     # Prepare the message structure for the LLM
+# #     messages = [
+# #         {"role": "system", "content": "You are a helpful assistant for museum ticket booking. Answer questions about ticket availability, pricing, and events."},
+# #         *session["chat_history"]
+# #     ]
+
+# #     # Call the Groq API to get the response from the LLM
+# #     response = client.chat.completions.create(
+# #         model="llama-3.1-8b-instant",
+# #         messages=messages
+# #     )
+    
+# #     assistant_response = response.choices[0].message.content
+
+# #     # Add the assistant's response to chat history
+# #     session["chat_history"].append({"role": "assistant", "content": assistant_response})
+
+# #     return jsonify({"response": assistant_response})
+
+# # if __name__ == '__main__':
+# #     app.run(debug=True)
+
+
+
 # import os
 # import json
 # from flask import Flask, request, jsonify, session, render_template
@@ -157,7 +230,7 @@ from groq import Groq
 import os
 import json
 
-app = Flask(__name__)
+app = Flask(name)
 CORS(app)
 
 # Configuration for session management
@@ -166,7 +239,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 # Load API key from config.json
-working_dir = os.path.dirname(os.path.abspath(__file__))
+working_dir = os.path.dirname(os.path.abspath(file))
 config_data = json.load(open(f"{working_dir}/config.json"))
 
 GROQ_API_KEY = config_data["GROQ_API_KEY"]
@@ -257,5 +330,6 @@ def reset_session():
     session.clear()
     return jsonify({"message": "Session reset successfully"})
 
-if __name__ == '__main__':
+if name == 'main':
     app.run(debug=True)
+
