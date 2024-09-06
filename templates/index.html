@@ -1,180 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Museum Chatbot</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🦙 LLAMA 3.1. ChatBot for Museum Ticket Booking</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-        }
-        .chat-container {
-            width: 100%;
-            max-width: 600px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .chat-header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-        }
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .user-message {
-            background-color: #e1ffc7;
-            margin-left: 40px;
-        }
-        .assistant-message {
-            background-color: #f0f0f0;
-            margin-right: 40px;
-        }
-        .input-area {
-            display: flex;
-            padding: 20px;
-        }
-        #user_prompt {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .action-buttons {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-        }
-        .action-buttons button {
-            flex-grow: 1;
-            margin: 0 5px;
-        }
-        #events-list {
-            display: none;
-            padding: 20px;
-        }
-        @media (max-width: 600px) {
-            .chat-container {
-                height: 100vh;
-                border-radius: 0;
-            }
-            .chat-box {
-                height: calc(100vh - 200px);
-            }
-        }
+      /* Add some basic styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+      #chat-box {
+        width: 80%;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      #faqs button {
+        display: block;
+        margin: 5px 0;
+      }
+      form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px auto;
+        max-width: 800px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+      button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+      }
+      button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+      button[type="button"] {
+        background-color: #28a745;
+        color: white;
+      }
+      button[type="button"]:hover {
+        background-color: #218838;
+      }
     </style>
-</head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            Museum Chatbot
-        </div>
-        <div class="chat-box" id="chat-box">
-            <!-- Chat messages will be dynamically added here -->
-        </div>
-        <div class="action-buttons">
-            <button onclick="startBooking()">Book Ticket</button>
-            <button onclick="showEvents()">Check Events</button>
-            <button onclick="provideFeedback()">Give Feedback</button>
-        </div>
-        <div id="events-list"></div>
-        <form id="chat-form" class="input-area">
-            <input type="text" id="user_prompt" name="user_prompt" placeholder="Type your message...">
-            <button type="submit">Send</button>
-        </form>
+  </head>
+  <body>
+    <h1>🦙 LLAMA 3.1. ChatBot for Museum Ticket Booking</h1>
+
+    <!-- Chat Box -->
+    <div id="chat-box">
+      {% for message in chat_history %}
+      <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+      {% endfor %}
     </div>
 
+    <!-- FAQ Suggestions -->
+    <h3>FAQs</h3>
+    <div id="faqs">
+      {% for faq in faqs %}
+      <button type="button" onclick="sendFaq('{{ faq }}')">{{ faq }}</button>
+      {% endfor %}
+    </div>
+
+    <!-- Language Selection -->
+    <label for="language">Select Language:</label>
+    <select id="language">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <!-- Add more languages as needed -->
+    </select>
+
+    <!-- Chat Form -->
+    <form id="chat-form">
+      <input
+        type="text"
+        id="user_prompt"
+        name="user_prompt"
+        placeholder="Ask about tickets, availability, pricing..."
+      />
+      <button type="submit">Send</button>
+      <button type="button" onclick="startVoiceRecognition()">
+        🎤 Voice Input
+      </button>
+    </form>
+
     <script>
-        document.getElementById("chat-form").onsubmit = async function(event) {
-            event.preventDefault();
-            let userPrompt = document.getElementById("user_prompt").value;
-            if (userPrompt.trim() === "") return;
+      // Handle FAQ suggestion click
+      function sendFaq(faq) {
+        document.getElementById("user_prompt").value = faq;
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+      }
 
-            addMessage('user', userPrompt);
+      // Handle chat form submission
+      document
+        .getElementById("chat-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
 
-            const response = await fetch("/ask", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: userPrompt })
-            });
+          let userPrompt = document.getElementById("user_prompt").value;
+          let language = document.getElementById("language").value;
+          if (userPrompt.trim() === "") return;
 
-            const data = await response.json();
-            if (data.response) {
-                addMessage('assistant', data.response);
-            }
+          const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: userPrompt, language: language }),
+          });
 
+          const data = await response.json();
+          if (data.response) {
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<p><strong>user:</strong> ${userPrompt}</p>`;
+            chatBox.innerHTML += `<p><strong>assistant:</strong> ${data.response}</p>`;
             document.getElementById("user_prompt").value = "";
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+          }
+        });
+
+      // Voice input using Web Speech API
+      function startVoiceRecognition() {
+        const recognition = new (window.SpeechRecognition ||
+          window.webkitSpeechRecognition)();
+        recognition.lang = document.getElementById("language").value;
+        recognition.interimResults = false;
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById("user_prompt").value = transcript;
+          document
+            .getElementById("chat-form")
+            .dispatchEvent(new Event("submit"));
         };
-
-        function addMessage(role, content) {
-            const chatBox = document.getElementById("chat-box");
-            const messageDiv = document.createElement("div");
-            messageDiv.className = `message ${role}-message`;
-            messageDiv.innerHTML = `<strong>${role}:</strong> ${content}`;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        async function showEvents() {
-            const response = await fetch("/events");
-            const events = await response.json();
-            const eventsList = document.getElementById("events-list");
-            eventsList.innerHTML = "<h3>Upcoming Events:</h3>";
-            events.forEach(event => {
-                eventsList.innerHTML += `<p>${event.name} - ${event.date}</p>`;
-            });
-            eventsList.style.display = "block";
-        }
-
-        async function startBooking() {
-            const response = await fetch("/start_booking", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            const data = await response.json();
-            if (data.response) {
-                addMessage('assistant', data.response);
-            }
-        }
-
-        function provideFeedback() {
-            addMessage('user', "I'd like to provide feedback.");
-        }
-
-        // Initial greeting
-        window.onload = function() {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML = ''; // Clear any existing messages
-            addMessage('assistant', "Welcome to the Museum Chatbot! How can I assist you today? You can ask about tickets, events, or use the buttons below for quick actions.");
-        };
+        recognition.start();
+      }
     </script>
-</body>
+  </body>
 </html>
