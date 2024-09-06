@@ -230,7 +230,7 @@ from groq import Groq
 import os
 import json
 
-app = Flask(name)
+app = Flask(__name__)
 CORS(app)
 
 # Configuration for session management
